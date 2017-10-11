@@ -13,17 +13,16 @@ import android.view.View;
 
 import com.niel.exoviewpager.gallery.ItemViewerFragment;
 import com.niel.exoviewpager.gallery.PreviewPagerAdapter;
+import com.niel.exoviewpager.gallery.ViewPagerAdapter;
 import com.niel.exoviewpager.loader.MediaLoader;
 import com.niel.exoviewpager.model.GalleryModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener,ItemViewerFragment.onItemClickedListner  {
+public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener{
 
     private static final int REQUEST_CODE_EXTERNAL = 100;
-
-//    protected PreviewPagerAdapter mAdapter;
 
     public ViewPager mViewPager;
 
@@ -31,15 +30,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     private List<GalleryModel> mData = new ArrayList<>();
 
-    private View mDecorView;
-
     private Toolbar toolbar;
 
-    boolean visible = true;
+//    protected PreviewPagerAdapter mAdapter;
 
-    private ActionBar mActionBar;
-
-    protected PreviewPagerAdapter mAdapter;
+    protected ViewPagerAdapter mAdapter;
 
 
     @Override
@@ -47,15 +42,12 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        mDecorView = getWindow().getDecorView();
-
         mViewPager = findViewById(R.id.imageViewerPager);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mActionBar = getSupportActionBar();
+        ActionBar mActionBar = getSupportActionBar();
         if (mActionBar != null) {
             mActionBar.setDisplayUseLogoEnabled(true);
             mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -75,10 +67,15 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         MediaLoader mediaLoader = new MediaLoader(this);
         mData = mediaLoader.getAllMediaFiles();
 
-        mAdapter = new PreviewPagerAdapter(getSupportFragmentManager(), null);
-        mViewPager.addOnPageChangeListener(this);
+//        mAdapter = new PreviewPagerAdapter(getSupportFragmentManager(), null);
+        mAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        mAdapter.addAll(mData);
+        for (GalleryModel model: mData) {
+            mAdapter.addFragment(ItemViewerFragment.newInstance(model),model.getName());
+        }
+
+        mViewPager.addOnPageChangeListener(this);
+//        mAdapter.addAll(mData);
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(mPreviousPos,false);
         updateTheToolbar(mPreviousPos);
@@ -93,37 +90,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             toolbar.setTitle(model.getName());
         }
     }
-    private void hideSystemUI() {
-        if (mActionBar != null) mActionBar.hide();
-        mDecorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-    }
-
-    private void showSystemUI() {
-        if (mActionBar != null) mActionBar.show();
-        mDecorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-    }
-
-
-    @Override
-    public void onItemClicked() {
-        if (visible) {
-            hideSystemUI();
-            visible = false;
-        } else {
-            showSystemUI();
-            visible = true;
-        }
-    }
-
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

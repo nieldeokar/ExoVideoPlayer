@@ -30,17 +30,6 @@ public class GalleryModel implements Parcelable {
 
     public GalleryModel(){}
 
-    public GalleryModel(String name,String mimeType,int resourcePath){
-        this.name = name;
-        this.mimeType = mimeType;
-        this.resourcePath = resourcePath;
-    }
-
-    public GalleryModel(String name,Uri uri,int resourcePath){
-        this.name = name;
-        this.fileUri = uri;
-        this.resourcePath = resourcePath;
-    }
 
     public GalleryModel(String name,String mimeType,String filePath){
         this.name = name;

@@ -49,12 +49,9 @@ import com.niel.exoviewpager.R;
 import com.niel.exoviewpager.model.GalleryModel;
 
 
-
-public class ItemViewerFragment extends Fragment implements View.OnClickListener {
+public class ItemViewerFragment extends Fragment {
 
     private static final String ARGS_ITEM = "args_item";
-
-    private onItemClickedListner mListner;
 
     private SimpleExoPlayer player;
 
@@ -70,16 +67,6 @@ public class ItemViewerFragment extends Fragment implements View.OnClickListener
         bundle.putParcelable(ARGS_ITEM, item);
         fragment.setArguments(bundle);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (context instanceof Activity) {
-            mListner = (onItemClickedListner) context;
-        }
-
     }
 
 
@@ -106,14 +93,12 @@ public class ItemViewerFragment extends Fragment implements View.OnClickListener
             simpleExoPlayerView.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.GONE);
 
-
             initializePlayer();
 
 
-        } else if(currentGalleryModel.isImage() || currentGalleryModel.isGif()) {
+        } else if (currentGalleryModel.isImage() || currentGalleryModel.isGif()) {
             simpleExoPlayerView.setVisibility(View.GONE);
             imageView.setVisibility(View.VISIBLE);
-
 
             Glide.with(this)
                     .load(currentGalleryModel.getFilePath())
@@ -122,23 +107,15 @@ public class ItemViewerFragment extends Fragment implements View.OnClickListener
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(imageView);
 
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mListner != null) mListner.onItemClicked();
-                }
-            });
         }
 
     }
 
     private void initializePlayer() {
 
-        MediaSource mediaSource ;
+        MediaSource mediaSource;
 
-        Uri mUri = Uri.parse("android.resource://com.niel.exoviewpager/" + currentGalleryModel.getFilePath());
-
-        if(currentGalleryModel.isAudio()){
+        if (currentGalleryModel.isAudio()) {
             trackSelector = new DefaultTrackSelector();
             player = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
 
@@ -146,9 +123,7 @@ public class ItemViewerFragment extends Fragment implements View.OnClickListener
             DataSource.Factory mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), getString(R.string.app_name)), (TransferListener<? super DataSource>) bandwidthMeter);
             DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-//             mediaSource = new ExtractorMediaSource(mUri, mediaDataSourceFactory, extractorsFactory, null, null);
-
-            if(currentGalleryModel.getFilePath()!=null){
+            if (currentGalleryModel.getFilePath() != null) {
 
                 mediaSource = new ExtractorMediaSource(Uri.parse(currentGalleryModel.getFilePath()),
                         mediaDataSourceFactory, extractorsFactory, null, null);
@@ -158,7 +133,7 @@ public class ItemViewerFragment extends Fragment implements View.OnClickListener
             }
 
 
-        }else {
+        } else {
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
 
             TrackSelection.Factory videoTrackSelectionFactory =
@@ -172,32 +147,20 @@ public class ItemViewerFragment extends Fragment implements View.OnClickListener
 
             DataSource.Factory mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), getString(R.string.app_name)), (TransferListener<? super DataSource>) bandwidthMeter);
 
-if(currentGalleryModel.getFilePath()!=null){
+            if (currentGalleryModel.getFilePath() != null) {
 
-    mediaSource = new ExtractorMediaSource(Uri.parse(currentGalleryModel.getFilePath()),
-            mediaDataSourceFactory, extractorsFactory, null, null);
-    player.setPlayWhenReady(false);
-    player.prepare(mediaSource);
+                mediaSource = new ExtractorMediaSource(Uri.parse(currentGalleryModel.getFilePath()),
+                        mediaDataSourceFactory, extractorsFactory, null, null);
+                player.setPlayWhenReady(false);
+                player.prepare(mediaSource);
 
-}
+            }
 
         }
 
 
         if (simpleExoPlayerView != null) simpleExoPlayerView.setPlayer(player);
 
-    }
-
-
-    @Override
-    public void onClick(View view) {
-
-        if (mListner != null) mListner.onItemClicked();
-    }
-
-
-    public interface onItemClickedListner {
-        void onItemClicked();
     }
 
     private void releasePlayer() {
@@ -242,11 +205,11 @@ if(currentGalleryModel.getFilePath()!=null){
         super.setUserVisibleHint(isVisibleToUser);
     }
 
-    public void imHiddenNow(){
-      releasePlayer();
+    public void imHiddenNow() {
+        releasePlayer();
     }
 
-    public void imVisibleNow(){
+    public void imVisibleNow() {
         initializePlayer();
     }
 
@@ -265,7 +228,6 @@ if(currentGalleryModel.getFilePath()!=null){
     public void onDetach() {
         super.onDetach();
     }
-
 
 
 }
